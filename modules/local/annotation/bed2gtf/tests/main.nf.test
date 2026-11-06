@@ -66,6 +66,90 @@ nextflow_process {
         }
     }
 
+    test("numeric and nonnumeric chromosomes - exons_only true") {
+
+        tag "chromosome_regression"
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                def inputDir = file("$outputDir/input")
+                inputDir.mkdirs()
+                def bed = file("$outputDir/input/mixed_chromosomes.bed12")
+                // Keep X beyond Polars' default 100-row schema inference window.
+                def chromosomes = (1..101).collect { it.toString() } + ['X']
+                bed.text = chromosomes.collect { chromosome ->
+                    [chromosome, 100, 200, 'circ' + chromosome, 0, '+',
+                     100, 200, 0, 2, '20,30', '0,70', 5, 'exonic',
+                     'gene' + chromosome, 'transcript' + chromosome, 0, 'intron'].join('\\t')
+                }.join('\\n') + '\\n'
+                input[0] = [[id: 'mixed_chromosomes'], bed, []]
+                input[1] = true
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            def chromosomes = (1..101).collect { it.toString() } + ['X']
+            def intervals = [[100, 120], [170, 200]]
+            def expected = chromosomes.collectMany { chromosome ->
+                intervals.collectMany { interval ->
+                    ['exon', 'CDS'].collect { feature ->
+                        [chromosome, 'nf-core/circrna', feature, interval[0], interval[1],
+                         0, '+', '.', 'gene_id "gene' + chromosome + '"; transcript_id "circ' + chromosome + '";'].join('\t')
+                    }
+                }
+            }
+            assert path(process.out.gtf[0][1]).readLines().sort() == expected.sort()
+        }
+    }
+
+    test("numeric and nonnumeric chromosomes - exons_only false") {
+
+        tag "chromosome_regression"
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+            process {
+                """
+                def inputDir = file("$outputDir/input")
+                inputDir.mkdirs()
+                def bed = file("$outputDir/input/mixed_chromosomes.bed12")
+                // Keep X beyond Polars' default 100-row schema inference window.
+                def chromosomes = (1..101).collect { it.toString() } + ['X']
+                bed.text = chromosomes.collect { chromosome ->
+                    [chromosome, 100, 200, 'circ' + chromosome, 0, '+',
+                     100, 200, 0, 2, '20,30', '0,70', 5, 'exonic',
+                     'gene' + chromosome, 'transcript' + chromosome, 0, 'intron'].join('\\t')
+                }.join('\\n') + '\\n'
+                input[0] = [[id: 'mixed_chromosomes'], bed, []]
+                input[1] = false
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            def chromosomes = (1..101).collect { it.toString() } + ['X']
+            def intervals = [[100, 200]]
+            def expected = chromosomes.collectMany { chromosome ->
+                intervals.collectMany { interval ->
+                    ['exon', 'CDS'].collect { feature ->
+                        [chromosome, 'nf-core/circrna', feature, interval[0], interval[1],
+                         0, '+', '.', 'gene_id "gene' + chromosome + '"; transcript_id "circ' + chromosome + '";'].join('\t')
+                    }
+                }
+            }
+            assert path(process.out.gtf[0][1]).readLines().sort() == expected.sort()
+        }
+    }
+
     test("annotated bed12 - stub") {
 
         options '-stub'

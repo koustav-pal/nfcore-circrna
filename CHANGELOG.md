@@ -39,6 +39,7 @@ Initial release of nf-core/circrna, created with the [nf-core](https://nf-co.re/
 
 ### `Fixed`
 
+- Read BED12 chromosome names as strings in the BED-to-GTF converter, preventing Polars parsing failures when numeric chromosomes precede names such as `X`. Add regression coverage for both exon conversion modes.
 - [#249](https://github.com/nf-core/circrna/pull/249) - Prepare circMiner's required annotation in `PREPARE_GENOME` with the nf-core AGAT module and a small exon-ordering step, avoiding a GTF-loading segmentation fault without changing other tools' annotations (@nictru)
 - [#248](https://github.com/nf-core/circrna/pull/248) - Build the STAR index for circtools discovery and FLI detection. Infer psirc strand from supporting transcripts, with canonical genomic splice motifs as a fallback (@nictru)
 - [#242](https://github.com/nf-core/circrna/pull/242) - `exons_only = false` was treated as `true` in `ANNOTATION` (`bed2gtf`) (@nictru)
