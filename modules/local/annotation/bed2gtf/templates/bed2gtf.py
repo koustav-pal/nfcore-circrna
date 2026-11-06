@@ -12,7 +12,7 @@ columns = ['chr', 'start', 'end', 'name', 'score', 'strand',
             'index', 'flankIntron'
             ]
 try:
-    df = pl.scan_csv('${bed12}', separator='\\t', has_header=False, new_columns=columns, raise_if_empty=True)
+    df = pl.scan_csv('${bed12}', separator='\\t', has_header=False, new_columns=columns, schema_overrides={"chr": pl.String}, raise_if_empty=True)
 except pl.exceptions.NoDataError:
     with open('${prefix}.gtf', 'w') as f:
         f.write('')
