@@ -15,12 +15,14 @@ df_annotation = pl.scan_csv(
     "${bsj_annotation}",
     separator="\\t",
     has_header=False,
+    schema_overrides={"chr": pl.String},
     new_columns=["chr", "start", "end", "name", "score", "strand", "thickStart", "thickEnd", "itemRgb", "exonCount", "exonSizes", "exonOffsets", "readNumber", "circType", "geneName", "isoformName", "index", "flankIntron"]
 )
 df_reads = pl.scan_csv(
     "${bsj_reads}",
     separator="\\t",
     has_header=False,
+    schema_overrides={"chr": pl.String},
     new_columns=["chr", "start", "end", "name", "score", "strand", "reads"]
 )
 

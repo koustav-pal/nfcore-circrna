@@ -26,6 +26,7 @@ try:
     df = pl.scan_csv("${beds}".split(" "),
                         separator="\\t",
                         has_header=False,
+                        schema_overrides={"chr": pl.String},
                         raise_if_empty=True,
                         new_columns=["chr", "start", "end", "name", "score", "strand", "sample", "tool"])
     df = df.collect().lazy()

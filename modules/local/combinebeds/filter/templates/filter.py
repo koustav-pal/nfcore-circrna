@@ -34,6 +34,7 @@ prefix = "${prefix}"
 df = pl.scan_csv("*.bed",
                  separator="\\t",
                  has_header=False,
+                 schema_overrides={"chr": pl.String},
                  new_columns=["chr", "start", "end", "name", "score", "strand", "sample", "tool"])
 
 df = df.group_by("chr", "start", "end", "strand").agg(tools=pl.col("tool").unique(), samples=pl.col("sample").unique())

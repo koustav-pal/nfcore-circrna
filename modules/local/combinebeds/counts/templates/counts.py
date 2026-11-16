@@ -25,7 +25,7 @@ bed_paths = "${beds}".split()
 columns = ["chr", "start", "end", "name", "score", "strand"]
 
 try:
-    df_candidates = pl.scan_csv(candidate_path, has_header=False, separator="\\t", new_columns=columns, raise_if_empty=True, extra_columns="ignore")
+    df_candidates = pl.scan_csv(candidate_path, has_header=False, schema_overrides={"chr": pl.String}, separator="\\t", new_columns=columns, raise_if_empty=True, extra_columns="ignore")
 except pl.exceptions.NoDataError:
     print("No data in ${candidates}")
     with open(f"{prefix}.tsv", "w") as f:
@@ -36,7 +36,7 @@ df_candidates = df_candidates.select(columns)
 df_candidates = df_candidates.with_columns(sample=pl.lit("candidate"), tool=pl.lit("candidate"), score=pl.lit(None))
 
 try:
-    df = pl.scan_csv(bed_paths, has_header=False, separator="\\t", new_columns=columns + ["sample", "tool"], raise_if_empty=True, truncate_ragged_lines=True)
+    df = pl.scan_csv(bed_paths, has_header=False, schema_overrides={"chr": pl.String}, separator="\\t", new_columns=columns + ["sample", "tool"], raise_if_empty=True, truncate_ragged_lines=True)
 except pl.exceptions.NoDataError:
     print("No data in ${beds}")
     with open(f"{prefix}.tsv", "w") as f:

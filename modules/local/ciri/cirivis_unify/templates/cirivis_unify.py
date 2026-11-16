@@ -76,7 +76,7 @@ output_file = "${prefix}.bed"
 print(f"Reading CIRI-vis data from: {input_file}")
 
 # Read CIRI-vis output
-df = pd.read_csv(input_file, sep="\\t")
+df = pd.read_csv(input_file, sep="\\t", dtype={"Chr": "string"})
 print(f"Loaded {len(df)} circRNA entries")
 
 # Convert to BED12

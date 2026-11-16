@@ -3,11 +3,11 @@
 import platform
 import polars as pl
 
-df_counts = pl.scan_csv("${counts}", separator="\\t")
+df_counts = pl.scan_csv("${counts}", separator="\\t", schema_overrides={"Chr": pl.String})
 df_counts = df_counts.rename({"paired.junctions": "Count"})
 
 join_columns = ['Chr', 'Start', 'End']
-df_coordinates = pl.scan_csv("${coordinates}", separator="\\t")
+df_coordinates = pl.scan_csv("${coordinates}", separator="\\t", schema_overrides={"Chr": pl.String})
 df_coordinates = df_coordinates.select(join_columns + ['Strand'])
 
 df_counts = df_counts.join(df_coordinates, on=join_columns, how='left')

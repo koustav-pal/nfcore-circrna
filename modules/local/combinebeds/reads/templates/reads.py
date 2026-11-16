@@ -31,7 +31,7 @@ dfs = []
 columns = ["chr", "start", "end", "name", "score", "strand", "reads"]
 
 for path, tool in zip(bed_files, tools):
-    df = pl.scan_csv(path, separator="\\t", has_header=False, new_columns=columns)
+    df = pl.scan_csv(path, separator="\\t", has_header=False, schema_overrides={"chr": pl.String}, new_columns=columns)
     df = df.with_columns(tool=pl.lit(tool))
     dfs.append(df)
 

@@ -9,7 +9,7 @@ max_shift = int("${max_shift}")
 
 # Logic
 
-df_consensus = pl.read_csv("${consensus}", separator="\\t", has_header=False)
+df_consensus = pl.read_csv("${consensus}", separator="\\t", has_header=False, schema_overrides={"column_0": pl.String})
 df_consensus = df_consensus.select("column_0", "column_1", "column_2")
 df_consensus = df_consensus.rename({"column_0": "Chr", "column_1": "Start", "column_2": "End"})
 
@@ -35,7 +35,7 @@ df_consensus = df_consensus.with_columns(
 df_consensus = df_consensus.select("Chr", "Start", "End")
 df_consensus = df_consensus.unique()
 
-df_anno = pl.scan_csv("${ciri_annotation}".split(), separator="\\t", has_header=True, truncate_ragged_lines=True)
+df_anno = pl.scan_csv("${ciri_annotation}".split(), separator="\\t", has_header=True, schema_overrides={"Chr": pl.String}, truncate_ragged_lines=True)
 df_anno = df_anno.select("BSJ", "Chr", "Start", "End")
 df_anno = df_anno.with_columns(
     pl.col("Start").cast(pl.Int64),
